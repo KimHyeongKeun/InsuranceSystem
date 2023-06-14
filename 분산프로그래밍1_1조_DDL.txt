@@ -1,0 +1,228 @@
+# =============== 분산프로그래밍1 1조 DB DDL ===============
+# (1개의 명령단위씩 쿼리 실행을 권장합니다.(오류 방지 목적))
+
+CREATE TABLE `pcustomer` (
+  `pcustomerID` int NOT NULL AUTO_INCREMENT,
+  `pcustomerName` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `phoneNumber` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `date` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `consultContext` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  PRIMARY KEY (`pcustomerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+
+CREATE TABLE `customer` (
+  `customerID` int NOT NULL AUTO_INCREMENT,
+  `pcustomerID` int DEFAULT NULL,
+  `address` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `customerNumber` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `eMail` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `job` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `sex` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `manageArrears` int DEFAULT NULL,
+  `ArrearsCount` int DEFAULT NULL,
+  `blackList` int DEFAULT NULL,
+  PRIMARY KEY (`customerID`),
+  KEY `pCustomerID_customer_fk_idx` (`pcustomerID`),
+  CONSTRAINT `pCustomerID_customer_fk` FOREIGN KEY (`pcustomerID`) REFERENCES `pcustomer` (`pcustomerID`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+
+CREATE TABLE `insurance` (
+  `insuranceID` int NOT NULL AUTO_INCREMENT,
+  `insuranceName` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `insuranceType` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `insuranceCost` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `contents` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `achieveRatio` int DEFAULT NULL,
+  PRIMARY KEY (`insuranceID`)
+) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+
+CREATE TABLE `contract` (
+  `contractID` int NOT NULL AUTO_INCREMENT,
+  `date` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `price` int DEFAULT NULL,
+  `endDate` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `insuranceRatio` float DEFAULT NULL,
+  `customerID` int NOT NULL,
+  `insuranceID` int NOT NULL,
+  PRIMARY KEY (`contractID`),
+  KEY `insuranceID_contract_fk_idx` (`insuranceID`),
+  KEY `customerID_contract_fk_idx` (`customerID`),
+  CONSTRAINT `customerID_contract_fk` FOREIGN KEY (`customerID`) REFERENCES `customer` (`customerID`) ON UPDATE CASCADE,
+  CONSTRAINT `insuranceID_contract_fk` FOREIGN KEY (`insuranceID`) REFERENCES `insurance` (`insuranceID`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+
+CREATE TABLE `salerecord` (
+  `insuranceID` int NOT NULL,
+  `goalCnt` int DEFAULT NULL,
+  `saleCnt` int DEFAULT NULL,
+  PRIMARY KEY (`insuranceID`),
+  CONSTRAINT `insuranceID_salerecord_fk` FOREIGN KEY (`insuranceID`) REFERENCES `insurance` (`insuranceID`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+
+CREATE TABLE `building` (
+  `customerID` int NOT NULL,
+  `buildingPrice` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `buildingSize` int DEFAULT NULL,
+  `buildingYear` int DEFAULT NULL,
+  `buildingOutwall` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `buildingHeight` int DEFAULT NULL,
+  PRIMARY KEY (`customerID`),
+  CONSTRAINT `customerID_building_fk` FOREIGN KEY (`customerID`) REFERENCES `customer` (`customerID`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+
+CREATE TABLE `car` (
+  `customerID` int NOT NULL,
+  `carType` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `own` int DEFAULT NULL,
+  `carNumber` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `carPrice` int DEFAULT NULL,
+  PRIMARY KEY (`customerID`),
+  CONSTRAINT `customerID_car_fk` FOREIGN KEY (`customerID`) REFERENCES `customer` (`customerID`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+
+CREATE TABLE `driver` (
+  `customerID` int NOT NULL,
+  `licenseNum` int DEFAULT NULL,
+  `carPurpose` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  PRIMARY KEY (`customerID`),
+  CONSTRAINT `customerID_driver_fk` FOREIGN KEY (`customerID`) REFERENCES `customer` (`customerID`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+
+CREATE TABLE `coverage` (
+  `coverageID` int NOT NULL AUTO_INCREMENT,
+  `insuranceID` int DEFAULT NULL,
+  `coverageContent` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `coverageCost` int DEFAULT NULL,
+  `coverageCondition` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  PRIMARY KEY (`coverageID`),
+  KEY `insuranceID_coverage_fk_idx` (`insuranceID`),
+  CONSTRAINT `insuranceID_coverage_fk` FOREIGN KEY (`insuranceID`) REFERENCES `insurance` (`insuranceID`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=104 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+
+CREATE TABLE `approve` (
+  `insuranceID` int NOT NULL,
+  `approved` int DEFAULT NULL,
+  `permissionDate` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `insuranceProblem` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `permissionRefuse` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  PRIMARY KEY (`insuranceID`),
+  CONSTRAINT `insuranceID_approve_fk` FOREIGN KEY (`insuranceID`) REFERENCES `insurance` (`insuranceID`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+
+CREATE TABLE `employee` (
+  `employeeID` int NOT NULL AUTO_INCREMENT,
+  `employeeName` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  PRIMARY KEY (`employeeID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+
+CREATE TABLE `accident` (
+  `accidentID` int NOT NULL AUTO_INCREMENT,
+  `accidentSize` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `accidentType` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `accidentDate` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `accidentTime` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `accidentPlace` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `customerID` int DEFAULT NULL,
+  `accidentComplete` tinyint DEFAULT NULL,
+  `judgementComplete` int DEFAULT NULL,
+  `date` varchar(45) COLLATE utf8mb3_bin DEFAULT NULL,
+  `accidentTitle` varchar(45) COLLATE utf8mb3_bin DEFAULT NULL,
+  PRIMARY KEY (`accidentID`),
+  KEY `customerID_accident_fk_idx` (`customerID`),
+  CONSTRAINT `customerID_accident_fk` FOREIGN KEY (`customerID`) REFERENCES `customer` (`customerID`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+
+CREATE TABLE `accidentInfo` (
+  `accidentID` int NOT NULL,
+  `completed` int DEFAULT NULL,
+  `judged` int DEFAULT NULL,
+  `date` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  PRIMARY KEY (`accidentID`),
+  CONSTRAINT `accidentID_accidentInfo_fk` FOREIGN KEY (`accidentID`) REFERENCES `accident` (`accidentID`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+
+CREATE TABLE `ainvestigation` (
+  `accidentID` int NOT NULL,
+  `scenario` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `record` int DEFAULT NULL,
+  `video` int DEFAULT NULL,
+  `photo` int DEFAULT NULL,
+  `damageScale` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  PRIMARY KEY (`accidentID`),
+  CONSTRAINT `accidentID_ainvestigation_fk` FOREIGN KEY (`accidentID`) REFERENCES `accident` (`accidentID`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+
+CREATE TABLE `damageAccess` (
+  `accidentID` int NOT NULL,
+  `employeeID` int DEFAULT NULL,
+  `payment` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `reason` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  PRIMARY KEY (`accidentID`),
+  KEY `employeeID_damageAccess_fk_idx` (`employeeID`),
+  CONSTRAINT `accidentID_damageAccess_fk` FOREIGN KEY (`accidentID`) REFERENCES `accident` (`accidentID`) ON UPDATE CASCADE,
+  CONSTRAINT `employeeID_damageAccess_fk` FOREIGN KEY (`employeeID`) REFERENCES `employee` (`employeeID`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+
+CREATE TABLE `exemption` (
+  `exemptionID` int NOT NULL AUTO_INCREMENT,
+  `accidentID` int DEFAULT NULL,
+  `subFile` int DEFAULT NULL,
+  `reason` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `legacy` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  PRIMARY KEY (`exemptionID`),
+  KEY `accidentID_exemption_fk_idx` (`accidentID`),
+  CONSTRAINT `accidentID_exemption_fk` FOREIGN KEY (`accidentID`) REFERENCES `accident` (`accidentID`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+
+
+
+# =============== Scenario상 Alternative, Exception demo를 위해 필요한 기본 dataset DML ===============
+
+INSERT INTO `pcustomer` VALUES (1,'김나은','010-5883-0056','2023.05.08','성공'),(2,'한요한','010-1234-5678','2023-05-01','ㅇ'),(3,'김승민','010-5678-1234','2023-05-01','apfhd'),(4,'유지민','010-0000-1234','2023-03-01','Auto insurance quote'),(5,'박재범','010-5555-7777','2023-04-01','어쩔티비'),(6,'김사람','010-5883-0056','2023-04-05','성공'),(7,'김일주','010-5883-0056','2023-04-18','성공'),(8,'이디야','010-5883-0056','2023-04-14','성공'),(9,'삼성','010-5883-0056','2023-04-16','성공'),(10,'아이리스','0104124123','2023-04-17','성공'),(11,'키보드','0105123123','2023-04-19','성공'),(12,'바나나','010-123123','2023-04-20','성공'),(13,'김프로','010-5883-0056','2023-04-21','성공'),(14,'김정호','010-1315-1531','2023-06-07','');
+
+
+INSERT INTO `customer` VALUES (29,2,'서울시 서대문구','911203-123456','hanyohan@naver.com','가수','남',1,1,0),(30,3,'서울시 강남구','950807-111111','sslspplz@naver.com','대학생','남',1,3,0),(31,4,'서울시 은평구','001203-222222','','의사','여',0,1,0),(32,5,'서울시 영등포구','020618-412345','','대학생','여',1,0,0),(33,1,'서울','020204-4111111','food0204@gmail.com','학생','du',NULL,NULL,NULL),(34,6,'서울','020204-1234567','40food@naver.com','학생','남성',NULL,NULL,NULL),(35,7,'서울','020204-4111111','food0204@gmail.com','교수','남성',NULL,NULL,NULL),(36,8,'서울','020204-4111111','food0204@gmail.com','학생','여성',NULL,NULL,NULL),(37,9,'서울','020204-4111111','food0204@gmail.com','학생','여성',NULL,NULL,NULL),(38,10,'서울','123123-1231231','food0204@gmail.com','학생','여성',NULL,NULL,NULL),(39,11,'서울','123123-1231231','food0204@gmail.com','학생','여성',NULL,NULL,NULL),(40,12,'서울','123123-1231231','food0204@gmail.com','학생','남성',NULL,NULL,NULL),(41,13,'서울','020204-4111111','food0204@gmail.com','학생','남성',NULL,NULL,NULL);
+
+
+INSERT INTO `insurance` VALUES (53,'driver1','car','10000','driver1',NULL),(54,'자동차 보험','자동차','100','어쩔저쩔',80),(55,'운전자 보험','운전자','200','어쩌고저쩌고',85),(56,'건물화재 보험','건물','150','시크릿쥬쥬리미티드에디션',75),(57,'자동차 보험','자동차','140','메롱',70),(58,'driver2','car','10000','driver1',NULL),(59,'driver3','car','10000','driver3',NULL),(60,'driver4','car','10000','driver4',NULL),(61,'driver8','car','10000','driver8',NULL),(62,'test10','car','10000','test10',NULL),(63,'test12','car','10000','test12',NULL),(64,'test21','car','1000','test21',NULL),(65,'test0111','car','10000','test0111',NULL);
+
+
+INSERT INTO `contract` VALUES (9,'2023-05-01',500,'2044-05-30',12,29,54),(10,'2023-06-01',300,'2024-05-29',13,30,55),(11,'2023-03-01',400,'2024-05-28',15,31,56),(12,'2023-05-01',200,'2024-05-28',16,32,57),(13,'2022-02-12',10000,'2027-02-12',12,29,53),(14,'2023-02-01',10000,'2026-12-12',0,33,53),(15,'10000',10000,'2024-02-12',0,34,53),(16,'2022-12-23',10000,'2024-03-12',0,35,53),(17,'2022-02-13',10000,'2024-02-13',0,36,53),(18,'2022-02-12',10000,'2024-02-12',0,37,53),(19,'2022-12-24',1000,'2023-12-24',0,38,53),(20,'2022-12-12',10000,'2023-12-12',0,39,53),(21,'2022-02-12',10000,'2023-02-12',0,40,53),(22,'2023-12-12',10000,'2024-12-12',0,41,53);
+
+
+INSERT INTO `salerecord` VALUES (53,300,140),(58,3000,140),(59,3000,123),(60,5000,2500),(61,2000,990),(62,4000,270),(63,2000,1250),(64,10000,9282),(65,1000,345);
+
+
+INSERT INTO `coverage` VALUES (77,53,'high',53,'high'),(78,53,'middle',200,'middle'),(79,53,'low',100,'low'),(80,58,'high',58,'high'),(81,58,'middle',200,'middle'),(82,58,'low',100,'low'),(83,59,'high',59,'high'),(84,59,'middle',2000,'middle'),(85,59,'low',1000,'low'),(86,60,'high',60,'high'),(87,60,'middle',200,'middle'),(88,60,'low',100,'low'),(89,61,'high',61,'high'),(90,61,'middle',200,'middle'),(91,61,'low',100,'low'),(92,62,'high',62,'high'),(93,62,'middle',200,'middle'),(94,62,'low',100,'low'),(95,63,'high',63,'high'),(96,63,'middle',200,'middle'),(97,63,'low',100,'low'),(98,64,'high',64,'high'),(99,64,'mid',200,'middle'),(100,64,'low',100,'low'),(101,65,'high',65,'high'),(102,65,'mid',200,'middle'),(103,65,'low',100,'low');
+
+
+INSERT INTO `approve` VALUES (53,1,'2023-06-06','null','null'),(58,1,'2023-06-06','null','null'),(59,1,'2023-06-06','null','null'),(60,1,'2023-06-06','null','null'),(61,1,'2023-06-06','null','null'),(62,1,'2023-06-06','null','null'),(63,1,'2023-06-06','null','null'),(64,1,'2023-06-07','null','null'),(65,1,'2023-06-07','null','null');
+
+
+INSERT INTO `accident` VALUES (1,'ㅇ','ㅇ','2023-01-03','1','ㅇ',29,1,1,'2022-02-22','12:13'),(2,'high','Car','2023-06-06','14:07','place',30,0,0,'date','title'),(3,'ㅇ','ㄹㅇ','2022-01-01','3','ㅇㄴ',29,1,0,'2022-02-23',NULL),(4,'중','car','2023-03-01','12:20','응암',29,1,0,'ㅇㅇ',NULL),(5,'중','ㅇ','2023-04-05','12','ㅇ',29,0,0,NULL,NULL);
+
+
+INSERT INTO `accidentInfo` VALUES (1,0,1,'2023-06-06'),(3,1,1,'2023-06-06'),(4,1,1,'2023-06-06'),(5,1,1,'2023-06-06');
+
+
+INSERT INTO `damageAccess` VALUES (1,NULL,'11111','ff');
+
+
+INSERT INTO `exemption` VALUES (2,1,1,'f','1'),(3,3,1,' ','legacy1');
+
